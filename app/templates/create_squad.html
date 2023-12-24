@@ -2,165 +2,162 @@
 
 {% block content %}
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>jQuery UI Droppable - Simple photo manager</title>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="/resources/demos/style.css">
-  <style>
-  #gallery { float: left; width: 65%; min-height: 12em; }
-  .gallery.custom-state-active { background: #eee; }
-  .gallery li { float: left; width: 96px; padding: 0.4em; margin: 0 0.4em 0.4em 0; text-align: center; }
-  .gallery li h5 { margin: 0 0 0.4em; cursor: move; }
-  .gallery li a { float: right; }
-  .gallery li a.ui-icon-zoomin { float: left; }
-  .gallery li img { width: 100%; cursor: move; }
- 
-  #trash { float: right; width: 32%; min-height: 18em; padding: 1%; }
-  #trash h4 { line-height: 16px; margin: 0 0 0.4em; }
-  #trash h4 .ui-icon { float: left; }
-  #trash .gallery h5 { display: none; }
-  </style>
-  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-  <script>
-  $( function() {
- 
-    // There's the gallery and the trash
-    var $gallery = $( "#gallery" ),
-      $trash = $( "#trash" );
- 
-    // Let the gallery items be draggable
-    $( "li", $gallery ).draggable({
-      cancel: "a.ui-icon", // clicking an icon won't initiate dragging
-      revert: "invalid", // when not dropped, the item will revert back to its initial position
-      containment: "document",
-      helper: "clone",
-      cursor: "move"
-    });
- 
-    $(".trash").each(function() {
-        $(this).droppable({
-            accept: "#gallery > li",
-            classes: {
-                "ui-droppable-active": "ui-state-highlight"
-            },
-            drop: function(event, ui) {
-                deleteImage(ui.draggable, $(this));
-            }
-        });
-    });
- 
-    // Let the gallery be droppable as well, accepting items from the trash
-    $gallery.droppable({
-      accept: "#trash li",
-      classes: {
-        "ui-droppable-active": "custom-state-active"
-      },
-      drop: function( event, ui ) {
-        recycleImage( ui.draggable );
-      }
-    });
- 
-    // Image deletion function
-    var recycle_icon = "<a href='link/to/recycle/script/when/we/have/js/off' title='Recycle this image' class='ui-icon ui-icon-refresh'>Recycle image</a>";
-    function deleteImage( $item ) {
-      $item.fadeOut(function() {
-        var $list = $( "ul", $trash ).length ?
-          $( "ul", $trash ) :
-          $( "<ul class='gallery ui-helper-reset'/>" ).appendTo( $trash );
- 
-        $item.find( "a.ui-icon-trash" ).remove();
-        $item.append( recycle_icon ).appendTo( $list ).fadeIn(function() {
-          $item
-            .animate({ width: "48px" })
-            .find( "img" )
-              .animate({ height: "36px" });
-        });
-      });
-    }
- 
-    // Image recycle function
-    var trash_icon = "<a href='link/to/trash/script/when/we/have/js/off' title='Delete this image' class='ui-icon ui-icon-trash'>Delete image</a>";
-    function recycleImage( $item ) {
-      $item.fadeOut(function() {
-        $item
-          .find( "a.ui-icon-refresh" )
-            .remove()
-          .end()
-          .css( "width", "96px")
-          .append( trash_icon )
-          .find( "img" )
-            .css( "height", "72px" )
-          .end()
-          .appendTo( $gallery )
-          .fadeIn();
-      });
-    }
- 
-    // Image preview function, demonstrating the ui.dialog used as a modal window
-    function viewLargerImage( $link ) {
-      var src = $link.attr( "href" ),
-        title = $link.siblings( "img" ).attr( "alt" ),
-        $modal = $( "img[src$='" + src + "']" );
- 
-      if ( $modal.length ) {
-        $modal.dialog( "open" );
-      } else {
-        var img = $( "<img alt='" + title + "' width='384' height='288' style='display: none; padding: 8px;' />" )
-          .attr( "src", src ).appendTo( "body" );
-        setTimeout(function() {
-          img.dialog({
-            title: title,
-            width: 400,
-            modal: true
-          });
-        }, 1 );
-      }
-    }
- 
-    // Resolve the icons behavior with event delegation
-    $( "ul.gallery > li" ).on( "click", function( event ) {
-      var $item = $( this ),
-        $target = $( event.target );
- 
-      if ( $target.is( "a.ui-icon-trash" ) ) {
-        deleteImage( $item );
-      } else if ( $target.is( "a.ui-icon-zoomin" ) ) {
-        viewLargerImage( $target );
-      } else if ( $target.is( "a.ui-icon-refresh" ) ) {
-        recycleImage( $item );
-      }
- 
-      return false;
-    });
-  } );
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy NBA Teams</title>
+    <style>
+        /* Inline CSS */
+        #team-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .team {
+            padding: 5px;
+            border: 1px solid black;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        .team-in-owner {
+            max-width: 50px;
+            max-height: 50px;
+        }
+
+        #owner-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .owner {
+            border: 1px solid blue;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 220px;
+        }
+
+        .owner img {
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .owner-name {
+            margin-bottom: 5px; /* Adjusted margin */
+        }
+
+        .dropzone {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            border: 1px dashed grey;
+            padding: 10px;
+            min-height: 50px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
- 
-<div class="ui-widget ui-helper-clearfix">
- 
-<ul id="gallery" class="gallery ui-helper-reset ui-helper-clearfix">
+
+    <button onclick="createSquads()">Create Squads</button> <!-- Button added here -->
+
+<div id="team-container">
     {% for team in teams %}
-    <li class="ui-widget-content ui-corner-tr">
-        <h5 class="ui-widget-header">{{ team.name }}</h5>
-        <img src="{{ team.logo_link }}" alt="{{ team.id }}" width="96" height="72">
-        <a href="{{ team.logo_link }}" title="View larger image" class="ui-icon ui-icon-zoomin">View larger</a>
-        <a href="link/to/trash/script/when/we/have/js/off" title="Delete this image" class="ui-icon ui-icon-trash">Delete image</a>
-    </li>
+    <div class="team" draggable="true" id="team-{{ team.id }}">
+        <img src="{{ team.logo_link }}" alt="{{ team.name }}">
+    </div>
     {% endfor %}
-</ul>
-{% for user in users %}
-<div id="trash-{{ user.id }}" class="trash ui-widget-content ui-state-default">
-  <h4 class="ui-widget-header">{{ user.username }}</h4>
-  <!-- Additional content -->
 </div>
-{% endfor %}
- 
+
+<div id="owner-container">
+    {% for user in users %}
+    <div class="owner" id="owner-{{ user.id }}">
+        <div class="owner-name">Team {{ user.username }}</div> <!-- Moved above the image -->
+        <img src="{{ user.profile_picture }}" alt="{{ user.name }}">
+        <div class="dropzone"></div>
+    </div>
+    {% endfor %}
 </div>
- 
- 
+
+<script>
+    // Inline JavaScript
+    document.addEventListener('DOMContentLoaded', () => {
+        const teams = document.querySelectorAll('.team');
+        const dropzones = document.querySelectorAll('.dropzone');
+
+        teams.forEach(team => {
+            team.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('text/plain', team.id);
+            });
+        });
+
+        dropzones.forEach(dropzone => {
+            dropzone.addEventListener('dragover', e => {
+                e.preventDefault();
+            });
+
+            dropzone.addEventListener('drop', e => {
+                e.preventDefault();
+                const teamId = e.dataTransfer.getData('text/plain');
+                const team = document.getElementById(teamId);
+                team.classList.add('team-in-owner');
+                dropzone.appendChild(team);
+                // Add code to update your server/database here
+            });
+        });
+    });
+
+    function createSquads() {
+        const owners = document.querySelectorAll('.owner');
+        let squads = [];
+    
+        owners.forEach(owner => {
+            const ownerId = owner.id.split('-')[1];
+            const teams = owner.querySelectorAll('.team');
+    
+            teams.forEach(team => {
+                const teamId = team.id.split('-')[1];
+                squads.push({ user_id: ownerId, team_id: teamId});
+            });
+        });
+    
+        // Send AJAX request to Flask
+        fetch('/create_squad', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ squads: squads })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Squads created:', data);
+            // Handle response
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+</script>
+
 </body>
 </html>
+
+
+
 {% endblock %}

@@ -1,24 +1,31 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from app.forms import CreateUserForm, CreateTeamForm
 from app import db
 from app import app
-from app.models import User, Team, Squad, Game
+from app.models import User, Team, Squad, Game, SquadName
 
 @app.route('/')
 @app.route('/index')
-def index():
-    user = {'username': 'Miguel'}
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', user=user, posts=posts)
+@app.route('/standings')
+def standings():
+    # get users, teams, squads, squad names, and games
+    users = User.query.all()
+    teams = Team.query.all()
+    squads = Squad.query.all()
+    games = Game.query.all()
+    squad_names = SquadName.query.all()
+
+    # use the squad get record method to get the squad records for each user
+    # the record should be by user, not id
+    squad_records = {}
+    for squad in squads:
+        squad_records[squad.id] = squad.get_record()
+    
+    print(squads)
+
+    return render_template('standings.html', title='Standings', 
+        users=users, teams=teams, squads=squads, games=games, squad_names=squad_names,
+        squad_records=squad_records)
 
 @app.route('/create_user', methods=['GET', 'POST'])
 def register():
@@ -44,9 +51,24 @@ def create_team():
 
 @app.route('/create_squad', methods=['GET', 'POST'])
 def create_squad():
-    # First get all the users
-    users = User.query.all()
-    # Get all the teams
-    teams = Team.query.all()
-    # Then pass the users to the template
-    return render_template('create_squad.html', title='Create Squad', teams=teams, users=users)
+    if request.method == 'POST':
+        # Handle the AJAX POST request
+        data = request.json
+        squads = data['squads']
+
+        for squad_data in squads:
+            squad = Squad(
+                user_id=squad_data['user_id'],
+                team_id=squad_data['team_id']
+            )
+            db.session.add(squad)
+        
+        db.session.commit()
+        return redirect(url_for('index'))
+
+    else:
+        # Handle the GET request as before
+        users = User.query.all()
+        teams = Team.query.all()
+        return render_template('create_squad.html', title='Create Squad', teams=teams, users=users)
+    

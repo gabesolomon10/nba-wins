@@ -22,22 +22,55 @@ class Team(db.Model):
     abbreviation: so.Mapped[str] = so.mapped_column(sa.String(5), index=True, unique=True)
     logo_link: so.Mapped[str] = so.mapped_column(sa.String(128), index=True, unique=True)
 
+    # create a method to calculate the team record
+    def get_record(self):
+        # Assuming each squad has one team for simplicity
+        games = Game.query.filter_by(team_id=self.id).all()
+        
+        wins = 0
+        losses = 0
+        for game in games:
+            if game.team_win:
+                wins += 1
+            else:
+                losses += 1
+
+        return {'wins': wins, 'losses': losses, 'win_pct': wins / (wins + losses)}
+
 class Squad(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
     team_id: so.Mapped[int] = so.mapped_column(sa.Integer, sa.ForeignKey('team.id'))
     team: so.Mapped[Team] = so.relationship('Team', backref='squads')
     user_id: so.Mapped[int] = so.mapped_column(sa.Integer, sa.ForeignKey('user.id'))
     user: so.Mapped[User] = so.relationship('User', backref='squads')
 
+    # create a method to calculate the squad record by user id 
+    def get_record(self):
+        # Assuming each squad has one team for simplicity
+        games = Game.query.filter_by(team_id=self.team_id).all()
+        
+        wins = 0
+        losses = 0
+        for game in games:
+            if game.team_win:
+                wins += 1
+            else:
+                losses += 1
+
+        return {'wins': wins, 'losses': losses, 'win_pct': wins / (wins + losses)}
+        
+
+class SquadName(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique = True)
+    squad_id: so.Mapped[int] = so.mapped_column(sa.Integer, sa.ForeignKey('squad.id'))
+    squad: so.Mapped[Squad] = so.relationship('Squad', backref='squad_names')
+
 class Game(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    date: so.Mapped[datetime] = so.mapped_column(sa.DateTime, index=True, unique=True)
-    home_team_id: so.Mapped[int] = so.mapped_column(sa.Integer, sa.ForeignKey('team.id'))
-    home_team = relationship('Team', foreign_keys=[home_team_id])
-    away_team_id: so.Mapped[int] = so.mapped_column(sa.Integer, sa.ForeignKey('team.id'))
-    away_team = relationship('Team', foreign_keys=[away_team_id])
-    home_team_score: so.Mapped[int] = so.mapped_column(sa.Integer)
-    away_team_score: so.Mapped[int] = so.mapped_column(sa.Integer)
-    home_team_win: so.Mapped[bool] = so.mapped_column(sa.Boolean)
-    away_team_win: so.Mapped[bool] = so.mapped_column(sa.Boolean)
+    gameid: so.Mapped[str] = so.mapped_column(sa.String(64), index=True)
+    date: so.Mapped[datetime] = so.mapped_column(sa.DateTime)
+    team_id: so.Mapped[int] = so.mapped_column(sa.Integer, sa.ForeignKey('team.id'))
+    team = relationship('Team', foreign_keys=[team_id])
+    team_score: so.Mapped[int] = so.mapped_column(sa.Integer)
+    team_win: so.Mapped[bool] = so.mapped_column(sa.Boolean)
