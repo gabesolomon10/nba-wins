@@ -17,3 +17,6 @@ class Config(object):
     # SQLAlchemy database URI
     SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
+    # secret key
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+

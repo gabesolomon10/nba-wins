@@ -11,6 +11,7 @@ class User(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True,
                                                 unique=True)
+    profile_picture: so.Mapped[str] = so.mapped_column(sa.String(128), nullable=True)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -19,7 +20,7 @@ class Team(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
     abbreviation: so.Mapped[str] = so.mapped_column(sa.String(5), index=True, unique=True)
-    logo_link: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
+    logo_link: so.Mapped[str] = so.mapped_column(sa.String(128), index=True, unique=True)
 
 class Squad(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
