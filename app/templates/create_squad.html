@@ -39,15 +39,16 @@
       cursor: "move"
     });
  
-    // Let the trash be droppable, accepting the gallery items
-    $trash.droppable({
-      accept: "#gallery > li",
-      classes: {
-        "ui-droppable-active": "ui-state-highlight"
-      },
-      drop: function( event, ui ) {
-        deleteImage( ui.draggable );
-      }
+    $(".trash").each(function() {
+        $(this).droppable({
+            accept: "#gallery > li",
+            classes: {
+                "ui-droppable-active": "ui-state-highlight"
+            },
+            drop: function(event, ui) {
+                deleteImage(ui.draggable, $(this));
+            }
+        });
     });
  
     // Let the gallery be droppable as well, accepting items from the trash
@@ -141,20 +142,21 @@
 <div class="ui-widget ui-helper-clearfix">
  
 <ul id="gallery" class="gallery ui-helper-reset ui-helper-clearfix">
-  {% for team in teams %}
-    {% if team.id == 1 %}
+    {% for team in teams %}
     <li class="ui-widget-content ui-corner-tr">
         <h5 class="ui-widget-header">{{ team.name }}</h5>
-        <img src="{{ team.logo_link }}" alt="The peaks of High Tatras" width="96" height="72">
+        <img src="{{ team.logo_link }}" alt="{{ team.id }}" width="96" height="72">
         <a href="{{ team.logo_link }}" title="View larger image" class="ui-icon ui-icon-zoomin">View larger</a>
         <a href="link/to/trash/script/when/we/have/js/off" title="Delete this image" class="ui-icon ui-icon-trash">Delete image</a>
     </li>
-    {% endif %}
+    {% endfor %}
 </ul>
- {% endfor %}
-<div id="trash" class="ui-widget-content ui-state-default">
-  <h4 class="ui-widget-header"><span class="ui-icon ui-icon-trash">Trash</span> Trash</h4>
+{% for user in users %}
+<div id="trash-{{ user.id }}" class="trash ui-widget-content ui-state-default">
+  <h4 class="ui-widget-header">{{ user.username }}</h4>
+  <!-- Additional content -->
 </div>
+{% endfor %}
  
 </div>
  
