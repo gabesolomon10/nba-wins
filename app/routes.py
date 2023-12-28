@@ -3,6 +3,8 @@ from app.forms import CreateUserForm, CreateTeamForm
 from app import db
 from app import app
 from app.models import User, Team, Squad, Game, SquadName
+from sqlalchemy import text, func, case, and_, or_, desc, distinct, Integer
+from sqlalchemy.orm import sessionmaker
 
 @app.route('/')
 @app.route('/index')
@@ -15,13 +17,24 @@ def standings():
     games = Game.query.all()
     squad_names = SquadName.query.all()
 
-    # use the squad get record method to get the squad records for each user
-    # the record should be by user, not id
-    squad_records = {}
-    for squad in squads:
-        squad_records[squad.id] = squad.get_record()
-    
-    print(squads)
+    # use sqlalchemy to calculate the team records
+    query = (
+        db.session.query(
+            User.id,
+            User.username,
+            User.profile_picture,
+            func.sum(Game.team_win.cast(Integer)).label('overall_wins'),
+            func.count(distinct(Game.gameid)).label('overall_games'),
+            func.count(distinct(Game.gameid)) - func.sum(Game.team_win).label('overall_losses'),
+            func.sum(Game.team_win.cast(Integer)) / func.count(distinct(Game.gameid)).label('win_pct')
+        )
+        .join(Team, Game.team_id == Team.id)
+        .join(Squad, Team.id == Squad.team_id)
+        .join(User, Squad.user_id == User.id)
+        .group_by(User.id, User.username, User.profile_picture)
+    )
+    # convert to dictionary
+    squad_records = query.all()
 
     return render_template('standings.html', title='Standings', 
         users=users, teams=teams, squads=squads, games=games, squad_names=squad_names,

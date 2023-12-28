@@ -15,47 +15,6 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
-    
-    # create a method to calculate the user record, since each user has a squad
-    # use the sqlachelmy relationship to get the squad 
-    # and the ORM to do a group by to calculate the user's squad record
-    def get_squad_record(self):
-        overall_wins = func.sum(case([(Game.team_win == True, 1)], else_=0)).label('overall_wins')
-        overall_losses = func.sum(case([(Game.team_win == False, 1)], else_=0)).label('overall_losses')
-        win_pct = (func.sum(case([(Game.team_win == True, 1)], else_=0)) /
-                   func.count(Game.id)).label('win_pct')
-
-        query = select([
-            overall_wins,
-            overall_losses,
-            win_pct
-        ]).select_from(
-            User
-        ).join(
-            Squad, Squad.user_id == User.id
-        ).join(
-            Team, Squad.team_id == Team.id
-        ).join(
-            Game, Team.id == Game.team_id
-        ).where(
-            User.id == self.id
-        ).group_by(
-            User.id
-        )
-
-        result = db.engine.execute(query).fetchone()
-
-        if result:
-            return {
-                'overall_wins': result.overall_wins or 0,
-                'overall_losses': result.overall_losses or 0,
-                'win_pct': result.win_pct or 0 if result.win_pct is not None else 0
-            }
-        else:
-            return {'overall_wins': 0, 'overall_losses': 0, 'win_pct': 0}
-
-
-
 
 class Team(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
